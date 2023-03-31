@@ -21,11 +21,11 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
 
-    target = "US"
+    target = "NUS"
     if target == "US":
-        startDate = "20230315"
+        startDate = "20230327"
     else:
-        startDate = "20230314"
+        startDate = "20230329"
     # Gather data and rank them
     # ranking based on RDX
 

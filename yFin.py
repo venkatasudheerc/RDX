@@ -29,10 +29,10 @@ class YFinance:
         end_date = now.strftime("%Y-%m-%d")
         # print(end_date)
         if self.ticker == "SPY" or self.ticker == "^NSEI":
-            self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval, start="2023-01-01",
+            self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval, start="2019-01-01",
                                     end=end_date)
         else:
-            self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval, start="2023-01-01",
+            self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval, start="2023-02-01",
                                     end=end_date)
         return self.data
 
@@ -82,7 +82,7 @@ class YFinance:
 
         logging.info("Custom data added")
 
-        self.data = self.data.round(decimals=2).tail(20)
+        self.data = self.data.round(decimals=2)
         self.data.to_csv(self.file_name)
         logging.info("data written to data.csv file")
         return self.data
