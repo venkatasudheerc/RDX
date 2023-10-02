@@ -1,9 +1,9 @@
 # This is a sample Python script.
 import logging
 import rankData
-import rsiStrategy
+# import rsiStrategy
 import strategy
-import macdv
+# import macdv
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
