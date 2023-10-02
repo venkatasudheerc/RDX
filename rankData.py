@@ -43,7 +43,6 @@ class RankData:
         except ArithmeticError as ex:
             print("Exception : ArithmeticError occurred.")
         except Exception as ex:
-            print(stock)
             print("Exception occurred.", ex.with_traceback())
 
     def rank_data(self):

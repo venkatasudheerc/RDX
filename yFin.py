@@ -39,7 +39,7 @@ class YFinance:
                 self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval,
                                         start="2023-07-15", end=end_date)
         else:
-            self.data = yf.download(tickers=self.ticker, period="50d", interval=self.interval)
+            self.data = yf.download(tickers=self.ticker, period="30d", interval=self.interval)
         return self.data
 
     def load_data(self):

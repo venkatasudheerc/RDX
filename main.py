@@ -32,7 +32,7 @@ if __name__ == '__main__':
     # ranking based on RDX
 
     try:
-        rank = rankData.RankData(target, interval="90m", symbol_count=200)
+        rank = rankData.RankData(target, interval="1d", symbol_count=200)
         df = rank.load_data()
         rank.rank_data()
 
