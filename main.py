@@ -1,7 +1,9 @@
 # This is a sample Python script.
 import logging
 import rankData
+import rsiStrategy
 import strategy
+import macdv
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
@@ -23,21 +25,27 @@ if __name__ == '__main__':
 
     target = "NUS"
     if target == "US":
-        startDate = "20230327"
+        startDate = "20230928"
     else:
-        startDate = "20230329"
+        startDate = "20230928"
     # Gather data and rank them
     # ranking based on RDX
 
     try:
-        rank = rankData.RankData(target)
+        rank = rankData.RankData(target, interval="90m", symbol_count=200)
         df = rank.load_data()
         rank.rank_data()
 
         # Strategy evaluation
+        # testStrategy = strategy.Strategy(target)
+        # testStrategy.load_index()
+        # testStrategy.evaluate(start_date=startDate)
+
+        # Strategy test
         testStrategy = strategy.Strategy(target)
         testStrategy.load_index()
         testStrategy.evaluate(start_date=startDate)
+
     except Exception as ex:
         print("Exception occurred.", ex, ex.with_traceback())
 

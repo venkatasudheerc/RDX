@@ -1,11 +1,14 @@
 from datetime import datetime, timedelta
 import logging
+
+import pandas as pd
 import yfinance as yf
 from ta.momentum import RSIIndicator
 from ta.trend import EMAIndicator
 from ta.trend import ADXIndicator
 from ta.trend import MACD
 from ta.volume import VolumeWeightedAveragePrice
+from ta.volatility import AverageTrueRange
 
 
 class YFinance:
@@ -28,24 +31,34 @@ class YFinance:
         now = datetime.now() + timedelta(days=1)
         end_date = now.strftime("%Y-%m-%d")
         # print(end_date)
-        if self.ticker == "SPY" or self.ticker == "^NSEI":
-            self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval, start="2019-01-01",
-                                    end=end_date)
+        if self.interval == "1d":
+            if self.ticker == "SPY" or self.ticker == "^NSEI":
+                self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval,
+                                        start="2023-07-15", end=end_date)
+            else:
+                self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval,
+                                        start="2023-07-15", end=end_date)
         else:
-            self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval, start="2023-02-01",
-                                    end=end_date)
+            self.data = yf.download(tickers=self.ticker, period="50d", interval=self.interval)
         return self.data
 
     def load_data(self):
         logging.info("Data Fetch Started")
         self.data = self.fetch_data()
+        self.data.to_csv(self.file_name)
         # print(self.data.head())
         logging.info("Data Fetch Completed")
 
+        # Data enrichment
+        self.data = pd.read_csv(self.file_name)
+
         # Add RSI
         indicator_rsi = RSIIndicator(self.data['Close'], window=14)
+        indicator_rsi5 = RSIIndicator(self.data['Close'], window=14)
         # Add ADX/DMI
         indicator_adx = ADXIndicator(self.data['High'], self.data['Low'], self.data['Close'], window=14)
+        indicator_adx5 = ADXIndicator(self.data['High'], self.data['Low'], self.data['Close'], window=14)
+        atr = AverageTrueRange(self.data['High'], self.data['Low'], self.data['Close'], window=26)
         # Add SMA 20
         # indicator_sma = SMAIndicator(self.data['Close'], window=20)
         # indicator_sma2 = SMAIndicator(self.data['Close'], window=13)
@@ -62,10 +75,13 @@ class YFinance:
         self.data['vwap'] = vwap.volume_weighted_average_price()
         # Calculate RDX
         self.data['rdx'] = indicator_rsi.rsi() + indicator_adx.adx_pos() - indicator_adx.adx_neg()
+        self.data['rdx5'] = indicator_rsi5.rsi() + indicator_adx5.adx_pos() - indicator_adx5.adx_neg()
         self.data['pdi'] = indicator_adx.adx_pos()
         self.data['mdi'] = indicator_adx.adx_neg()
         self.data['adx'] = indicator_adx.adx()
         self.data['rsi'] = indicator_rsi.rsi()
+        self.data['rsi5'] = indicator_rsi5.rsi()
+        self.data['macdv'] = indicator_macd.macd_diff()*100/atr.average_true_range()
         # self.data['sma20'] = indicator_sma.sma_indicator()
         # self.data['sma13'] = indicator_sma2.sma_indicator()
         self.data['ema21'] = indicator_ema.ema_indicator()
@@ -80,9 +96,14 @@ class YFinance:
         self.data['bull_signal'] = self.data['bullish'] & self.data['bullish'].rolling(2).sum().eq(1)
         self.data['bear_signal'] = self.data['bearish'] & self.data['bearish'].rolling(2).sum().eq(1)
 
+        if self.interval != "1d":
+            self.data['date1'] = pd.to_datetime(self.data['Datetime']).dt.date
+            self.data = self.data.drop_duplicates(subset='date1', keep="first")
+            self.data = self.data.rename(columns={"Datetime": "Date"})
+
         logging.info("Custom data added")
 
         self.data = self.data.round(decimals=2)
-        self.data.to_csv(self.file_name)
+        self.data.to_csv(self.file_name, index=False)
         logging.info("data written to data.csv file")
         return self.data
