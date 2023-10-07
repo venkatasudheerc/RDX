@@ -1,10 +1,12 @@
 # This is a sample Python script.
 import logging
 import rankData
-# import rsiStrategy
 import strategy
-# import macdv
 import warnings
+
+# import rsiStrategy
+# import macdv
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=RuntimeWarning)
 
@@ -23,16 +25,16 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
 
-    target = "NUS"
+    target = "US"
     if target == "US":
-        startDate = "20230928"
+        startDate = "20231006"
     else:
-        startDate = "20230928"
+        startDate = "20231002"
     # Gather data and rank them
     # ranking based on RDX
 
     try:
-        rank = rankData.RankData(target, interval="1d", symbol_count=200)
+        rank = rankData.RankData(target, interval="90m", symbol_count=200)
         df = rank.load_data()
         rank.rank_data()
 
@@ -47,7 +49,7 @@ if __name__ == '__main__':
         testStrategy.evaluate(start_date=startDate)
 
     except Exception as ex:
-        print("Exception occurred.", ex, ex.with_traceback())
+        print("Exception occurred.", ex)
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
