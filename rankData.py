@@ -26,7 +26,8 @@ class RankData:
         self.clean_dir()
         indices = pd.Series(['SPY', '^NSEI'])
         # print(type(indices))
-        df = pd.read_csv(self.target_symbols, nrows=self.symbol_count+1)
+        # df = pd.read_csv(self.target_symbols, nrows=self.symbol_count+1)
+        df = pd.read_csv(self.target_symbols    )
         self.symbols = df['SYMBOL']
         # print(len(self.symbols))
         # print((self.symbols.append(indices, ignore_index=True)))
