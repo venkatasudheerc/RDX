@@ -19,6 +19,7 @@ class YFinance:
         self.interval = interval
         self.country = country
         self.file_name = data_location + ticker.upper() + ".csv"
+        self.magic = 0
 
         '''
         if ticker[0] == '^':
@@ -33,11 +34,14 @@ class YFinance:
         # print(end_date)
         if self.interval == "1d":
             if self.ticker == "SPY" or self.ticker == "^NSEI":
-                self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval,
-                                        start="2023-08-01", end=end_date)
+                if self.magic:
+                    self.data = yf.download(tickers=self.ticker, period="20d", interval="30m")
+                else:
+                    self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval,
+                                            start="2023-09-10", end=end_date)
             else:
                 self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval,
-                                        start="2023-08-01", end=end_date)
+                                        start="2023-09-10", end=end_date)
         else:
             self.data = yf.download(tickers=self.ticker, period="20d", interval=self.interval)
         return self.data
@@ -56,10 +60,10 @@ class YFinance:
 
             # Add RSI
             indicator_rsi = RSIIndicator(self.data['Close'], window=14)
-            indicator_rsi5 = RSIIndicator(self.data['Close'], window=14)
+            indicator_rsi5 = RSIIndicator(self.data['Close'], window=5)
             # Add ADX/DMI
             indicator_adx = ADXIndicator(self.data['High'], self.data['Low'], self.data['Close'], window=14)
-            indicator_adx5 = ADXIndicator(self.data['High'], self.data['Low'], self.data['Close'], window=14)
+            indicator_adx5 = ADXIndicator(self.data['High'], self.data['Low'], self.data['Close'], window=5)
             atr = AverageTrueRange(self.data['High'], self.data['Low'], self.data['Close'], window=26)
             # Add SMA 20
             # indicator_sma = SMAIndicator(self.data['Close'], window=20)
@@ -83,7 +87,7 @@ class YFinance:
             self.data['adx'] = indicator_adx.adx()
             self.data['rsi'] = indicator_rsi.rsi()
             self.data['rsi5'] = indicator_rsi5.rsi()
-            self.data['macdv'] = indicator_macd.macd_diff()*100/atr.average_true_range()
+            self.data['macdv'] = indicator_macd.macd_diff() * 100 / atr.average_true_range()
             # self.data['sma20'] = indicator_sma.sma_indicator()
             # self.data['sma13'] = indicator_sma2.sma_indicator()
             self.data['ema21'] = indicator_ema.ema_indicator()
@@ -98,7 +102,7 @@ class YFinance:
             self.data['bull_signal'] = self.data['bullish'] & self.data['bullish'].rolling(2).sum().eq(1)
             self.data['bear_signal'] = self.data['bearish'] & self.data['bearish'].rolling(2).sum().eq(1)
 
-            if self.interval != "1d":
+            if self.interval != "1d" or (self.magic and (self.ticker == "SPY" or self.ticker == "^NSEI")):
                 self.data['date1'] = pd.to_datetime(self.data['Datetime']).dt.date
                 self.data = self.data.drop_duplicates(subset='date1', keep="last")
                 self.data = self.data.rename(columns={"Datetime": "Date"})
