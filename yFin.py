@@ -19,7 +19,7 @@ class YFinance:
         self.interval = interval
         self.country = country
         self.file_name = data_location + ticker.upper() + ".csv"
-        self.magic = 0
+        self.magic = 1
 
         '''
         if ticker[0] == '^':
@@ -35,15 +35,15 @@ class YFinance:
         if self.interval == "1d":
             if self.ticker == "SPY" or self.ticker == "^NSEI":
                 if self.magic:
-                    self.data = yf.download(tickers=self.ticker, period="20d", interval="30m")
+                    self.data = yf.download(tickers=self.ticker, period="60d", interval="90m")
                 else:
                     self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval,
-                                            start="2023-09-10", end=end_date)
+                                            start="2023-10-01", end=end_date)
             else:
                 self.data = yf.download(tickers=self.ticker, period=self.period, interval=self.interval,
-                                        start="2023-09-10", end=end_date)
+                                        start="2023-10-01", end=end_date)
         else:
-            self.data = yf.download(tickers=self.ticker, period="20d", interval=self.interval)
+            self.data = yf.download(tickers=self.ticker, period="60d", interval=self.interval)
         return self.data
 
     def load_data(self):
